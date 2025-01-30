@@ -1,0 +1,7 @@
+crewai
+autogen
+streamlit
+python-dotenv
+openai
+requests
+agentops
