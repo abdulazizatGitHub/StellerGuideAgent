@@ -1,6 +1,7 @@
 from crewai import Task
 import requests
 import os
+import time
 from dotenv import load_dotenv
 from Agent.agents import create_analytics_agent, create_data_fetcher
 
@@ -18,9 +19,12 @@ def fetch_mars_weather():
         agent=data_fetcher,
         expected_output="JSON data with temperature, wind speed, and season.",
         async_execution=True,
-        action=lambda: requests.get(
-            f"https://api.nasa.gov/insight_weather/?api_key={NASA_KEY}&feedtype=json&ver=1.0"
-        ).json()
+        action=lambda: (
+            time.sleep(1),  # Add delay between requests
+            requests.get(
+                f"https://api.nasa.gov/insight_weather/?api_key={NASA_KEY}&feedtype=json&ver=1.0"
+            ).json()
+        )[-1]  # Return the result of the last expression
     )
 
 def analyze_data_task():

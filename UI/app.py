@@ -20,35 +20,40 @@ st.title("🚀 StellarGuide: Your Space Assistant")
 # User Input
 query = st.text_input("Ask about space:", "What's happening on Mars today?")
 
+# Update app.py
 if st.button("Search"):
-    # Crew Setup
-    data_fetcher = create_data_fetcher()
-    analytics_agent = create_analytics_agent()
-    
-    # To this:
-    crew = Crew(
-        agents=[data_fetcher, analytics_agent],
-        tasks=[fetch_mars_weather(), analyze_data_task()],
-        verbose=True  # ✅ Correct boolean value
-    )
-    
-    # Execute Tasks
-    result = crew.kickoff()
-    
-    # Display Results
-    st.subheader("Latest Mars Weather")
-    st.json(result)
-    
-    # Educator Explanation
-    st.subheader("Explanation for Students")
-    citizen_agent.initiate_chat(educator, message=f"Explain this to a 10-year-old: {result}")
-    st.write(educator.last_message()["content"])
-    
-    # Generate Image
-    image_prompt = f"Friendly cartoon of Mars with weather: {result}"
-    response = client.images.generate(
-        model="dall-e-3",
-        prompt=image_prompt,
-        size="1024x1024"
-    )
-    st.image(response.data[0].url, caption="AI-Generated Mars Scene")
+    try:
+        # Crew Setup
+        data_fetcher = create_data_fetcher()
+        analytics_agent = create_analytics_agent()
+        
+        crew = Crew(
+            agents=[data_fetcher, analytics_agent],
+            tasks=[fetch_mars_weather(), analyze_data_task()],
+            verbose=True
+        )
+        
+        # Execute Tasks
+        result = crew.kickoff()
+        
+        # Display Results
+        st.subheader("Latest Mars Weather")
+        st.json(result)
+        
+        # Educator Explanation
+        st.subheader("Explanation for Students")
+        citizen_agent.initiate_chat(educator, message=f"Explain this to a 10-year-old: {result}")
+        st.write(educator.last_message()["content"])
+        
+        # Generate Image
+        image_prompt = f"Friendly cartoon of Mars with weather: {result}"
+        response = client.images.generate(
+            model="dall-e-3",
+            prompt=image_prompt,
+            size="1024x1024"
+        )
+        st.image(response.data[0].url, caption="AI-Generated Mars Scene")
+
+    except Exception as e:
+        st.error(f"An error occurred: {str(e)}")
+        st.info("Please check your OpenAI API key and quota status")
